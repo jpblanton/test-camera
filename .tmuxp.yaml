@@ -1,0 +1,15 @@
+session_name: ${PROJ}
+start_directory: "${PWD}"
+shell_command_before: sv
+environment:
+  PROJ: test-camera
+windows:
+  - window_name: main
+    layout: main-vertical
+    panes:
+    -
+    -
+    -
+  - window_name: jupyter
+    panes:
+    - jlab --no-browser
