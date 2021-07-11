@@ -5,7 +5,8 @@ import struct
 
 import picamera
 
-local = True
+local = False
+DELAY = 30
 
 if local:
     with picamera.PiCamera() as camera:
@@ -13,12 +14,12 @@ if local:
         time.sleep(2) # wake up
         for filename in camera.capture_continuous('img{timestamp}.jpg'):
             print('Captured %s' % filename)
-            time.sleep(60) # wait 5 minutes
+            time.sleep(DELAY) # wait 5 minutes
 else:
     # Connect a client socket to my_server:8000 (change my_server to the
     # hostname of your server)
     client_socket = socket.socket()
-    client_socket.connect(('172.30.163.100', 8008))
+    client_socket.connect(('192.168.1.55', 9999))
 
     # Make a file-like object out of the connection
     connection = client_socket.makefile('wb')
@@ -42,14 +43,13 @@ else:
                 # Rewind the stream and send the image data over the wire
                 stream.seek(0)
                 connection.write(stream.read())
-                # If we've been capturing for more than 30 seconds, quit
-                if time.time() - start > 30:
-                    break
                 # Reset the stream for the next capture
                 stream.seek(0)
                 stream.truncate()
+                time.sleep(DELAY)
         # Write a length of zero to the stream to signal we're done
         connection.write(struct.pack('<L', 0))
     finally:
+        connection.write(struct.pack('<L', 0))
         connection.close()
         client_socket.close()
